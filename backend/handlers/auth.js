@@ -57,7 +57,11 @@ module.exports = {
                             }
                             let token = generateToken(JSON.stringify({username: username, password: encrypted}));
                             if (done) {
-                                res.json({id: 1, error: null, result: token});
+                                let result = {
+                                    token: token,
+                                    username: username
+                                }
+                                res.json({id: 1, error: null, result: result});
                             }
                         });
                     }
@@ -84,7 +88,11 @@ module.exports = {
                     } else {
                         if (same) {
                             let token = generateToken(JSON.stringify({username: username, password: data.password}));
-                            res.json({id: 1, error: null, result: token});
+                            let result = {
+                                token: token,
+                                username: username
+                            }
+                            res.json({id: 1, error: null, result: result});
                             return;
                         } else {
                             res.json({id: 1, error: 'Wrong username or password'});
