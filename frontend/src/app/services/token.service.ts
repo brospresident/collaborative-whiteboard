@@ -20,4 +20,10 @@ export class TokenService {
   public checkToken(): boolean {
     return false;
   }
+
+  public deleteToken() {
+    if (this.getToken().length != 0) {
+      window.localStorage.removeItem('cw_token');
+    }
+  }
 }

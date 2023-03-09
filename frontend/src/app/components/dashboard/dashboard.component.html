@@ -1,1 +1,32 @@
-<p>dashboard works!</p>
+<app-sidebar [stateManager]="stateManager"></app-sidebar>
+
+<div class="main-container">
+    <div *ngIf="stateManager.getDashboardView() === 'projects'">
+        <h3>Your projects</h3>
+        <hr>
+        <ng-template #content let-modal>
+            <div class="modal-header">
+                <h4 class="modal-title" id="modal-basic-title">Create new project</h4>
+                <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="project_name">Project name</label>
+                    <div class="input-group">
+                        <input
+                            id="project_name"
+                            class="form-control"
+                            placeholder="Project name"
+                            [(ngModel)]="project_name"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-dark" (click)="clickSave()">Save</button>
+            </div>
+        </ng-template>
+        <button (click)="open(content)" class="button-3">New Project</button>
+    </div>
+    <div *ngIf="stateManager.getDashboardView() === 'invitations'">INVITATIONS</div>
+</div>

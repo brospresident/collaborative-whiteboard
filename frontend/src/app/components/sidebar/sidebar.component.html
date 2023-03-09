@@ -1,0 +1,17 @@
+<nav id="sidebar">
+    <div class="sidebar-title">
+        <h3>Draw.io</h3>
+    </div>
+    <hr>
+    <div class="sidebar-user">
+        <p class="sidebar-logged-in-as">Logged in as: {{username}}</p>
+        <button (click)="logout()" class="button-24 margin-left">Log Out</button>
+    </div>
+    <hr>
+    <div class="sidebar-content">
+        <button (click)="changeView('projects')" class="button-89 margin-left margin-bottom">My Projects</button>
+    </div>
+    <div class="sidebar-content">
+        <button (click)="changeView('invitations')" class="button-89 margin-left margin-bottom">Invitations</button>
+    </div>
+</nav>

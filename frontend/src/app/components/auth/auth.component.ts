@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { RpcService } from 'src/app/services/rpc.service';
 import { TokenService } from 'src/app/services/token.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-auth',
@@ -18,7 +19,8 @@ export class AuthComponent implements OnInit {
   constructor(
     private rpcService: RpcService,
     private tokenService: TokenService,
-    private router: Router
+    private router: Router,
+    private userService: UserService
   ) {}
 
   ngOnInit() {
@@ -37,8 +39,10 @@ export class AuthComponent implements OnInit {
       if (err) {
         that.fillError(err);
       } else {
-        that.tokenService.setToken(result.result);
-        that.router.navigate(['/dashboard']);
+        that.tokenService.setToken(result.result.token);
+        if (that.userService.setUser(result.result.username)) {
+          that.router.navigate(['/dashboard']);
+        }
       }
     });
   }
@@ -65,8 +69,10 @@ export class AuthComponent implements OnInit {
       if (err) {
         that.fillError(err);
       } else {
-        that.tokenService.setToken(result.result);
-        that.router.navigate(['/dashboard']);
+        that.tokenService.setToken(result.result.token);
+        if (that.userService.setUser(result.result.username)) {
+          that.router.navigate(['/dashboard']);
+        }
       }
     });
   }
