@@ -11,7 +11,7 @@ import {InputTextModule} from 'primeng/inputtext';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
-import { DrawerComponent } from './componnents/drawer/drawer.component';
+import { DrawerComponent } from './components/drawer/drawer.component';
 
 @NgModule({
   declarations: [

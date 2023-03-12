@@ -41,4 +41,11 @@
     border-bottom: 3px solid gray;
     background-color: rgb(211, 205, 205);
     padding-bottom: 5px;
+    display: flex;
+    flex-direction: row;
+}
+
+.color {
+  margin-top: 0.5%;
+  margin-left: 5%;
 }

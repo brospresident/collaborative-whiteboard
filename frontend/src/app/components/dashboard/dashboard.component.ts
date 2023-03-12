@@ -59,7 +59,7 @@ export class DashboardComponent implements OnInit, OnChanges {
   clickSave() {
     this.modalService.dismissAll('Saved');
     let project_id = (Math.random() * 10); // Provizoriu
-    this.router.navigate(['/canvas'], { queryParams: { project_id: project_id } })
+    this.router.navigate(['/canvas'], { queryParams: { project_id: project_id }, queryParamsHandling: 'merge' })
     // TODO: Logica de salvare in db.
   }
 }

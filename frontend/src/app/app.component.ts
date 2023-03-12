@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TokenService } from './services/token.service';
 
 @Component({
@@ -8,13 +8,11 @@ import { TokenService } from './services/token.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'frontend';
+  // title = 'frontend';
 
-  constructor(private router: Router, private tokenService: TokenService) {
+  constructor(private router: Router, private tokenService: TokenService, private route: ActivatedRoute) {
     if (tokenService.getToken().length == 0) {
       router.navigate(['/auth']);
-    } else {
-      router.navigate(['/dashboard'])
     }
   }
 
