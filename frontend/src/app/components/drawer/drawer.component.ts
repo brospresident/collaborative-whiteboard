@@ -4,6 +4,7 @@ import { Layer } from 'konva/lib/Layer';
 import Konva from 'konva';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SocketService } from 'src/app/services/socket.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-drawer',
@@ -21,36 +22,49 @@ export class DrawerComponent implements OnInit, OnDestroy {
   isErasing: any = false;
   lastLine!: any;
   projectId: any;
+  timeout: any;
+  socketShapes: any = [];
 
   constructor(private router: Router, private route: ActivatedRoute, 
-              private socketService: SocketService) {
-
-  }
-
-  ngOnInit() {
-    this.projectId = this.route.snapshot.queryParamMap.get('project_id');
-    let that = this;
+              private socketService: SocketService,
+              private userService: UserService
+    ) {
     this.socketService.connect();
-    this.socketService.on('newData', (data) => {
+    let that = this;
+    this.socketService.on('client:draw', (data) => {
       data = JSON.parse(data);
-      if (data.projectId == this.projectId && this.stage && this.layer) {
-        that.clear();
+      if (data.projectId == this.projectId && this.stage && this.layer && this.userService.getUser() != data.sender) {
+        that.clear(true);
         let shapes = data.shapes;
         for (let shape of shapes) {
           shape = JSON.parse(shape);
-          console.log(shape)
-          // that.layer.add(shape);
-          // that.layer.draw();
-          that.shapes.push(shape);
+          console.log(shape);
+          that.socketShapes.push(shape);
         }
         that.redrawLayer();
       }
     });
   }
 
+  sendData() {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
+
+    this.timeout = setTimeout(() => {
+      this.emitEvent();
+    }, 1000);
+  }
+
+  ngOnInit() {
+    this.projectId = this.route.snapshot.queryParamMap.get('project_id');
+  }
+
   redrawLayer() {
-    for (const shape of this.shapes) {
+    this.shapes.length = 0;
+    for (const shape of this.socketShapes) {
       let shapeObj = this.createShapes(shape) as any;
+      this.shapes.push(shapeObj);
       this.layer.add(shapeObj);
     }
     this.layer.draw();
@@ -60,16 +74,13 @@ export class DrawerComponent implements OnInit, OnDestroy {
     let attrs = obj.attrs;
     switch(obj.className) {
       case "Rect": {
-        return new Konva.Rect({
-          x: attrs.x,
-          y: attrs.y,
-          fill: attrs.fill,
-          stroke: attrs.stroke,
-          strokeWidth: 2,
-          draggable: true,
-          width: attrs.width,
-          height: attrs.height
-        });
+        return new Konva.Rect(attrs);
+      }
+      case "Circle": {
+        return new Konva.Circle(attrs);
+      }
+      case "Line": {
+        return new Konva.Line(attrs);
       }
     }
     return;
@@ -81,13 +92,24 @@ export class DrawerComponent implements OnInit, OnDestroy {
 
   public emitEvent(): void {
     let data = this.buildSocketData();
-    this.socketService.emit('newData', data);
+    // console.log(data);
+    this.socketService.emit('server:draw', data);
+    // this.socketService.disconnect();
+    // this.socketService.connect();
   }
 
   public buildSocketData() {
+    let jsonShapes = [];
+    for (let shape of this.shapes) {
+      // console.log(shape);
+      if (!shape) continue;
+      jsonShapes.push(shape.toJSON());
+    }
+
     return JSON.stringify({
-      shapes: this.shapes,
-      projectId: this.projectId
+      projectId: this.projectId,
+      shapes: jsonShapes,
+      sender: this.userService.getUser()
     });
   }
   
@@ -156,7 +178,7 @@ export class DrawerComponent implements OnInit, OnDestroy {
     }
 
     const pos = this.stage.getPointerPosition();
-    if (pos) {
+    if (pos && this.lastLine) {
       const newPoints = this.lastLine.points().concat([pos.x, pos.y]);
       this.lastLine.points(newPoints);
       this.layer.batchDraw();
@@ -171,21 +193,27 @@ export class DrawerComponent implements OnInit, OnDestroy {
     this.shapes.push(this.lastLine);
     // this.isDrawing = false;
     this.lastLine = null;
-    this.emitEvent();
+    this.sendData();
   }
 
   drawCircle() {
     this.isDrawing = false;
     this.isErasing = false;
-
+  
+    // Remove the random x and y coordinates for the circle
     const circle = new Konva.Circle({
-      x: Math.random() * this.stage.width(),
-      y: Math.random() * this.stage.height(),
+      x: 0,
+      y: 0,
       radius: 50,
       fill: this.fill,
       stroke: this.stroke,
       strokeWidth: 2,
       draggable: true // make the circle draggable
+    });
+
+    circle.on('dragend', (event) => {
+      // TOOD: call socket
+      this.sendData();
     });
   
     // Create a transformer for the circle
@@ -196,25 +224,28 @@ export class DrawerComponent implements OnInit, OnDestroy {
     // Add the transformer to the layer
     this.layer.add(tr);
   
-    // Listen for click events on the circle to select it and enable the transformer
-    circle.on('click', (event) => {
-      const clickedOnTransformer = tr.nodes().indexOf(event.target) >= 0;
-      if (!clickedOnTransformer) {
-        tr.nodes([circle]);
-        this.layer.draw();
-      } else {
-        tr.nodes([]);
-        this.layer.draw();
-      }
-      event.cancelBubble = true;
-    });
-    
-    this.layer.add(circle);
-    this.layer.draw();
+    // Listen for click events on the stage to create the circle at the clicked position
+    this.stage.on('click', (event) => {
+      circle.position({
+        x: event.evt.offsetX,
+        y: event.evt.offsetY,
+      });
+      // Add the circle to the layer
+      this.layer.add(circle);
+      // Enable the transformer for the circle
+      tr.nodes([circle]);
+      // Update the layer
+      this.layer.batchDraw();
+      // Remove the click event listener from the stage
+      this.stage.off('click');
 
-    this.shapes.push(circle);
-    this.emitEvent();
+      this.shapes.push(circle);
+    
+      this.sendData();
+    });
+  
   }
+  
 
   drawRectangle() {
     this.isDrawing = false;
@@ -251,16 +282,30 @@ export class DrawerComponent implements OnInit, OnDestroy {
       }
       event.cancelBubble = true;
     });
-    
-    this.layer.add(rect);
-    this.layer.draw();
 
-    this.shapes.push(rect);
-    this.emitEvent();
+    // Listen for click events on the stage to create the circle at the clicked position
+    this.stage.on('click', (event) => {
+      rect.position({
+        x: event.evt.offsetX,
+        y: event.evt.offsetY,
+      });
+      // Add the circle to the layer
+      this.layer.add(rect);
+      // Enable the transformer for the circle
+      tr.nodes([rect]);
+      // Update the layer
+      this.layer.batchDraw();
+      // Remove the click event listener from the stage
+      this.stage.off('click');
+
+      this.shapes.push(rect);
+    
+      this.sendData();
+    });
 
   }
 
-  clear() {
+  clear(isSocket: boolean) {
     // Destroy the current layer and create a new one
     this.layer.destroy();
     this.layer = new Konva.Layer();
@@ -276,7 +321,11 @@ export class DrawerComponent implements OnInit, OnDestroy {
     this.stage.batchDraw();
 
     this.shapes.length = 0;
-    this.emitEvent();
+
+    console.log('finished cleaning');
+
+    if (isSocket) return;
+    this.sendData();
   }
 
   goToDashboard() {

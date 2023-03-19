@@ -19,11 +19,11 @@ const io = require('socket.io')(server, {
 const PORT = process.env.PORT || 3000;
 
 io.on('connection', (socket) => {
-    logger.info('a user connected');
+    logger.info(`A user with id ${socket.id} just joined.`);
 
-    socket.on('newData', (data) => {
+    socket.on('server:draw', (data) => {
         logger.info(data);
-        io.emit('newData', data);
+        socket.broadcast.emit('client:draw', data);
     });
 
     socket.on('disconnect', () => {
