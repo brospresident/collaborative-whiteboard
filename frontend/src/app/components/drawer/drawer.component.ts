@@ -12,7 +12,7 @@ import { UserService } from 'src/app/services/user.service';
   styleUrls: ['./drawer.component.css']
 })
 export class DrawerComponent implements OnInit, OnDestroy {
-  shapes: any = [];
+  shapes: any[] = [];
   stage!: Stage;
   layer!: Layer;
   fill: any = 'black';
@@ -23,22 +23,28 @@ export class DrawerComponent implements OnInit, OnDestroy {
   lastLine!: any;
   projectId: any;
   timeout: any;
-  socketShapes: any = [];
+  socketShapes: any[] = [];
 
-  constructor(private router: Router, private route: ActivatedRoute, 
+  constructor(private router: Router, 
+              private route: ActivatedRoute, 
               private socketService: SocketService,
               private userService: UserService
     ) {
     this.socketService.connect();
     let that = this;
     this.socketService.on('client:draw', (data) => {
+      data = data as any;
       data = JSON.parse(data);
-      if (data.projectId == this.projectId && this.stage && this.layer && this.userService.getUser() != data.sender) {
+      that.socketShapes.length = 0;
+      if (data.projectId == that.projectId && that.stage && that.layer && that.userService.getUser() != data.sender) {
         that.clear(true);
-        let shapes = data.shapes;
-        for (let shape of shapes) {
+        let _shapes = data.shapes;
+        if (!_shapes) {
+          return;
+        }
+        for (let shape of _shapes) {
           shape = JSON.parse(shape);
-          console.log(shape);
+          // console.log(shape);
           that.socketShapes.push(shape);
         }
         that.redrawLayer();
@@ -47,12 +53,13 @@ export class DrawerComponent implements OnInit, OnDestroy {
   }
 
   sendData() {
+    let that = this;
     if (this.timeout) {
-      clearTimeout(this.timeout);
+      clearTimeout(that.timeout);
     }
 
     this.timeout = setTimeout(() => {
-      this.emitEvent();
+      that.emitEvent();
     }, 1000);
   }
 
@@ -325,6 +332,7 @@ export class DrawerComponent implements OnInit, OnDestroy {
     console.log('finished cleaning');
 
     if (isSocket) return;
+    this.shapes.length = 0;
     this.sendData();
   }
 
