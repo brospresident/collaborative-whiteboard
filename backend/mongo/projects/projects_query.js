@@ -1,12 +1,14 @@
+const logger = require('nlogger').logger(module);
 const projectModel = require('./projects_schema');
 
 module.exports = {
-    add_project: function(createdBy, projectId, callback) {
+    add_project: function(createdBy, name, projectId, callback) {
         const newProject = new projectModel({
             createdBy,
             createdDate: new Date(),
             projectId,
-            shapes: []
+            shapes: [],
+            name: name
         });
 
         newProject.save().then(saved => {
@@ -37,6 +39,15 @@ module.exports = {
                 callback(rejected, null);
                 return;
             }
+        });
+    },
+
+    get_project_data: function(projectId, callback) {
+        projectModel.findOne({projectId: projectId}).then(data => {
+            logger.info(data);
+            callback(null, data);
+        }).catch(reject => {
+            callback(reject, null);
         });
     }
 }

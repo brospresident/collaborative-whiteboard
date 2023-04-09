@@ -1,11 +1,12 @@
 const express = require('express');
 const projectsQuery = require('../mongo/projects/projects_query');
 const crypto = require('crypto');
-const { logger } = require('nlogger');
+const logger = require('nlogger').logger(module);
 const usersQuery = require('../mongo/users/users_query');
+const async = require('async');
 
 function generateProjectId() {
-    return crypto.randomBytes(10).toString('utf8');
+    return crypto.randomBytes(10).toString('hex');
 }
 
 /**
@@ -16,9 +17,10 @@ function generateProjectId() {
 const projects = {
     add_project: function(req, res, next) {
         let createdBy = req.body.params.createdBy;
+        let name = req.body.params.name;
         let projectId = generateProjectId();
 
-        projectsQuery.add_project(createdBy, projectId, (err, _result) => {
+        projectsQuery.add_project(createdBy, name, projectId, (err, _result) => {
             if (err) {
                 logger.info(err);
                 res.json({id: 1, error: err});
@@ -33,23 +35,38 @@ const projects = {
                         res.json({id: 1, error: null, result});
                         return;
                     }
-                })
+                });
             }
         });
     },
 
-    invitation_accepted: function(req, res, next) {
-        let username = req.body.params.username;
-        let projectId = req.body.params.projectId;
+    get_projects_data: function(req, res, next) {
+        let projects = req.body.params.projectIds;
+        projects = projects.map(project => project.project_id);
 
-        usersQuery.addProjectToUser(username, projectId, [], (error, result) => {
+        let projects_data = [];
+
+        if (!projects.length) {
+            res.json({id: 1, error: 'no projects'});
+            return;
+        }
+
+        async.eachLimit(projects, 3, (project, callback) => {
+            projectsQuery.get_project_data(project, (error, result) => {
+                if (error) {
+                    callback(error);
+                } else {
+                    projects_data.push(result);
+                    callback();
+                }
+            });
+        }, (error) => {
             if (error) {
                 logger.info(error);
                 res.json({id: 1, error});
                 return;
             } else {
-                // TODO: SA STEARGA ddin user invitatia la proiectul projectId (query + call la db aici)
-                res.json({id: 1, error: null, result});
+                res.json({id: 1, error: null, result: projects_data});
                 return;
             }
         });

@@ -1,0 +1,16 @@
+.proj-container {
+    border: 1px solid gray;
+    border-radius: 25px;
+    padding: 10px;
+    width: 50%;
+}
+
+.margin-top {
+    margin-top: 20px;
+    text-decoration: none;
+}
+
+.no-dec {
+    text-decoration: none;
+
+}

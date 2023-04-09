@@ -6,6 +6,7 @@ import { TokenService } from 'src/app/services/token.service';
 import { UserService } from 'src/app/services/user.service';
 import { ModalDismissReasons, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
+import { PROJECT_TYPES } from 'src/app/constants';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,6 +17,9 @@ export class DashboardComponent implements OnInit, OnChanges {
   view: any;
   closeResult = '';
   project_name = '';
+  userProjects: any[] = [];
+  loading: boolean = true;
+  projectType!: PROJECT_TYPES;
   constructor(private userService: UserService,
               private tokenService: TokenService,
               private rpcService: RpcService,
@@ -24,7 +28,31 @@ export class DashboardComponent implements OnInit, OnChanges {
               private router: Router) {}
 
   ngOnInit(): void {
-    
+    let that = this;
+    this.rpcService.ask('users.getUserProjects', {username: that.userService.getUser()}, (error: any, result: any) => {
+      if (error) {
+        console.log('eroare la get projects', error);
+        return;
+      }
+
+      let projectIds = result.result;
+
+      that.rpcService.ask('projects.get_projects_data', {projectIds: projectIds}, (err: any, res: any) => {
+        if (res.error) {
+          console.log(res.error);
+          return
+        }
+
+        that.userProjects = res.result;
+        console.log(that.userProjects);
+
+        if (that.stateManager.getDashboardView() == 'projects') {
+          that.projectType = PROJECT_TYPES.PROJECT;
+        } else {
+          that.projectType = PROJECT_TYPES.INVITATION;
+        }
+      });
+    });
   }
 
   ngOnChanges() {
@@ -52,14 +80,21 @@ export class DashboardComponent implements OnInit, OnChanges {
 		}
 	}
 
-  // generateProjectId() {
-  //   return randomBytes(16).toString("hex").slice(0, 7);
-  // }
-
   clickSave() {
-    this.modalService.dismissAll('Saved');
-    let project_id = (Math.random() * 10); // Provizoriu
-    this.router.navigate(['/canvas'], { queryParams: { project_id: project_id }, queryParamsHandling: 'merge' })
+    // this.modalService.dismissAll('Saved');
+    // let project_id = (Math.random() * 10); // Provizoriu
+    // this.router.navigate(['/canvas'], { queryParams: { project_id: project_id }, queryParamsHandling: 'merge' })
     // TODO: Logica de salvare in db.
+
+    let that = this;
+    this.rpcService.ask('projects.add_project', {createdBy: this.userService.getUser(), name: this.project_name}, (error: any, result: any) => {
+      if (result.error || error) {
+        console.log(result.error);
+        return;
+      }
+
+      that.modalService.dismissAll();
+      that.ngOnInit();
+    });
   }
 }

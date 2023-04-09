@@ -1,4 +1,5 @@
 module.exports = {
     auth: require('./auth'),
-    projects: require('./projects')
+    projects: require('./projects'),
+    users: require('./users')
 };

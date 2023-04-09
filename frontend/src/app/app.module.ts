@@ -12,6 +12,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { DrawerComponent } from './components/drawer/drawer.component';
+import { ProjectComponent } from './components/project/project.component';
+import { IconsComponent } from './components/icons/icons.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +21,9 @@ import { DrawerComponent } from './components/drawer/drawer.component';
     AuthComponent,
     DashboardComponent,
     SidebarComponent,
-    DrawerComponent
+    DrawerComponent,
+    ProjectComponent,
+    IconsComponent
   ],
   imports: [
     BrowserModule,

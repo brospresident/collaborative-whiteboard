@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const userModel = require('./users_schema');
-const  logger  = require('nlogger').logger(module);
+const logger = require('nlogger').logger(module);
+
 
 
 function insertUser(data, callback) {
@@ -35,8 +36,8 @@ function getUser(username, callback) {
 }
 
 function addProjectToUser(username, project_id, roles, callback) {
-    userModel.findOneAndUpdate({username: username}, 
-        { $push: {
+    userModel.findOneAndUpdate({username: username}, { 
+        $push: {
             projects: {
                 project_id: project_id,
                 roles: roles
@@ -49,8 +50,38 @@ function addProjectToUser(username, project_id, roles, callback) {
         });
 }
 
+function deleteProjectInvitation(username, project_id, callback) {
+    userModel.findOneAndUpdate({username: username}, {
+        $pull: {
+            invitations: {
+                item: project_id 
+            }
+        }
+    }).then(deleted => {
+        callback(null, deleted);
+    }).catch(rejected => {
+        callback(rejected, null);
+    });
+}
+
+function insertProjectInvitation(username, project_id, callback) {
+    userModel.findOneAndUpdate({username: username}, {
+        $push: {
+            invitations: {
+                item: project_id
+            }
+        }
+    }, {new: true}).then(data => {
+        callback(null, data);
+    }).catch(rejected => {
+        callback(rejected, null);
+    });
+}
+
 module.exports = {
     insertUser,
     getUser,
-    addProjectToUser
+    addProjectToUser,
+    deleteProjectInvitation,
+    insertProjectInvitation
 }

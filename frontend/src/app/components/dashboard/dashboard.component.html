@@ -27,6 +27,12 @@
             </div>
         </ng-template>
         <button (click)="open(content)" class="button-3">New Project</button>
+        <div *ngIf="userProjects.length">
+            <hr>
+            <div *ngFor="let project of userProjects">
+                <app-project [type]="projectType" [project]="project"></app-project>
+            </div>
+        </div>
     </div>
     <div *ngIf="stateManager.getDashboardView() === 'invitations'">INVITATIONS</div>
 </div>

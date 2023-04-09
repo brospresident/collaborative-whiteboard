@@ -1,0 +1,4 @@
+export enum PROJECT_TYPES {
+    INVITATION,
+    PROJECT
+}

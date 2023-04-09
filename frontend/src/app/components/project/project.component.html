@@ -1,0 +1,32 @@
+<div class="proj-container">
+    <div class="row" *ngIf="type==projectTypes.PROJECT">
+        <div class="col-md-6">
+            <h3>Project Name: {{project.name}}</h3>
+            <div>Project Id: {{project.projectId}}</div>
+            <div>Created By: {{project.createdBy}}</div>
+            <div>Creation Date: {{project.createdDate.split("T")[0]}}</div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <a class="no-dec" routerLink="/canvas" [queryParams]="{project_id: project.projectId}">
+                    <app-icons [icon]="'link'"></app-icons>
+                    Go To project
+                </a>
+            </div>
+
+            <div class="row">
+                <a class="margin-top" (click)="leaveProject(project.projectId)">
+                    <app-icons [icon]="'leave'"></app-icons>
+                    Leave project
+                </a>
+            </div>
+
+            <div class="row">
+                <a class="margin-top" (click)="openInviteModal()">
+                    <app-icons [icon]="'invite'"></app-icons>
+                    Invite new member
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
