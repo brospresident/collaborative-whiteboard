@@ -64,11 +64,15 @@ function deleteProjectInvitation(username, project_id, callback) {
     });
 }
 
-function insertProjectInvitation(username, project_id, callback) {
+function insertProjectInvitation(username, invited_by, project_id, callback) {
     userModel.findOneAndUpdate({username: username}, {
         $push: {
             invitations: {
-                item: project_id
+                item: {
+                    project_id: project_id,
+                    invited_by: invited_by,
+                    invitation_date: new Date()
+                }
             }
         }
     }, {new: true}).then(data => {

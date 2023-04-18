@@ -14,6 +14,7 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { DrawerComponent } from './components/drawer/drawer.component';
 import { ProjectComponent } from './components/project/project.component';
 import { IconsComponent } from './components/icons/icons.component';
+import { InvitationModalComponent } from './components/invitation-modal/invitation-modal.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { IconsComponent } from './components/icons/icons.component';
     SidebarComponent,
     DrawerComponent,
     ProjectComponent,
-    IconsComponent
+    IconsComponent,
+    InvitationModalComponent
   ],
   imports: [
     BrowserModule,

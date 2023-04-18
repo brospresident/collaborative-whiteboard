@@ -1,5 +1,19 @@
-<div class="proj-container">
-    <div class="row" *ngIf="type==projectTypes.PROJECT">
+<div *ngIf="type==projectTypes.PROJECT" class="proj-container">
+    <ng-template #content let-modal>
+        <div class="modal-header">
+            <h4 class="modal-title" id="modal-basic-title">Invitation modal</h4>
+            <button type="button" class="btn-close" aria-label="Close" (click)="closeInvite()"></button>
+        </div>
+        <div class="modal-body">
+            <input class="form-control" type="text" [(ngModel)]="invited_username" placeholder="eg: andrei@draw.io">
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-success" (click)="sendInvitation()">Invite</button>
+        </div>
+    </ng-template>
+
+
+    <div class="row">
         <div class="col-md-6">
             <h3>Project Name: {{project.name}}</h3>
             <div>Project Id: {{project.projectId}}</div>
@@ -14,15 +28,15 @@
                 </a>
             </div>
 
-            <div class="row">
+            <div *ngIf="project.createdBy != user" class="row">
                 <a class="margin-top" (click)="leaveProject(project.projectId)">
                     <app-icons [icon]="'leave'"></app-icons>
                     Leave project
                 </a>
             </div>
 
-            <div class="row">
-                <a class="margin-top" (click)="openInviteModal()">
+            <div *ngIf="project.createdBy == user" class="row">
+                <a class="margin-top" (click)="open(content)">
                     <app-icons [icon]="'invite'"></app-icons>
                     Invite new member
                 </a>
@@ -30,3 +44,32 @@
         </div>
     </div>
 </div>
+
+<div *ngIf="type==projectTypes.INVITATION" class="proj-container">
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Project Name: {{project.name}}</h3>
+            <div>Project Id: {{project.projectId}}</div>
+            <div>Created By: {{project.createdBy}}</div>
+            <div>Creation Date: {{project.createdDate.split("T")[0]}}</div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <a class="no-dec">
+                    <app-icons [icon]="'link'"></app-icons>
+                    Accept invite
+                </a>
+
+                <a class="no-dec">
+                    <app-icons [icon]="'link'"></app-icons>
+                    Reject invite
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+

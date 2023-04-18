@@ -40,5 +40,6 @@ server.listen(PORT, () => {
         logger.info(`MongoDB connected at ${new Date()}`);
     }).catch(rejected => {
         logger.info(rejected);
+        process.exit(1);
     });
 });

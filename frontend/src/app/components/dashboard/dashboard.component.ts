@@ -20,6 +20,8 @@ export class DashboardComponent implements OnInit, OnChanges {
   userProjects: any[] = [];
   loading: boolean = true;
   projectType!: PROJECT_TYPES;
+  userInvitations: any[] = [];
+
   constructor(private userService: UserService,
               private tokenService: TokenService,
               private rpcService: RpcService,
@@ -37,6 +39,8 @@ export class DashboardComponent implements OnInit, OnChanges {
 
       let projectIds = result.result;
 
+      console.log('projectIds', projectIds);
+
       that.rpcService.ask('projects.get_projects_data', {projectIds: projectIds}, (err: any, res: any) => {
         if (res.error) {
           console.log(res.error);
@@ -46,11 +50,36 @@ export class DashboardComponent implements OnInit, OnChanges {
         that.userProjects = res.result;
         console.log(that.userProjects);
 
-        if (that.stateManager.getDashboardView() == 'projects') {
-          that.projectType = PROJECT_TYPES.PROJECT;
-        } else {
-          that.projectType = PROJECT_TYPES.INVITATION;
-        }
+        that.rpcService.ask('users.getUserInvitations', {username: that.userService.getUser()}, (error: any, result: any) => {
+          if (error || result.error) {
+            console.log('eroare la get invitations', error);
+            return;
+          }
+
+          let invitationsIds = result.result;
+          console.log('invids', invitationsIds);
+  
+          that.rpcService.ask('projects.get_projects_data', {projectIds: invitationsIds}, (err: any, res: any) => {
+            if (res.error) {
+              console.log(res.error);
+              // return
+            } 
+    
+            if (res.result) {
+              that.userInvitations = res.result;
+            } else {
+              that.userInvitations = [];
+            }
+
+            console.log(that.userInvitations);
+    
+            if (that.stateManager.getDashboardView() == 'projects') {
+              that.projectType = PROJECT_TYPES.PROJECT;
+            } else {
+              that.projectType = PROJECT_TYPES.INVITATION;
+            }
+          });
+        });
       });
     });
   }

@@ -9,7 +9,7 @@ const userSchema = new Schema({
         project_id: String,
         roles: [String]
     }],
-    invitations: [String]
+    invitations: []
 });
 
 const userModel = mongoose.model('User', userSchema);

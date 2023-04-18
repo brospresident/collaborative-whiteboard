@@ -33,6 +33,21 @@
                 <app-project [type]="projectType" [project]="project"></app-project>
             </div>
         </div>
+        <div *ngIf="!userProjects.length">
+            <p>You are not member of any project!</p>
+        </div>
     </div>
-    <div *ngIf="stateManager.getDashboardView() === 'invitations'">INVITATIONS</div>
+    <div *ngIf="stateManager.getDashboardView() === 'invitations'">
+        <h3>Your invitations</h3>
+        <hr>
+        <div *ngIf="userInvitations.length">
+            <hr>
+            <div *ngFor="let invitation of userInvitations">
+                <app-project [type]="projectType" [project]="invitation"></app-project>
+            </div>
+        </div>
+        <div *ngIf="!userInvitations.length">
+            <p>You do not have any invitations.</p>
+        </div>
+    </div>
 </div>
