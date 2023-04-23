@@ -1,6 +1,6 @@
 const express = require('express');
 const usersQuery = require('../mongo/users/users_query');
-const { logger } = require('nlogger').logger(module);;
+const { logger } = require('nlogger').logger(module);
 
 const users = {
     getUserProjects: function(req, res, next) {
@@ -27,6 +27,7 @@ const users = {
                 return;
             } else {
                 let invitations = result && result.invitations;
+                console.log(invitations);
                 res.json({id: 1, error: null, result: invitations});
                 return;
             }

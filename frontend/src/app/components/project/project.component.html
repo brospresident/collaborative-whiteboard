@@ -55,13 +55,13 @@
         </div>
         <div class="col-md-6">
             <div class="row">
-                <a class="no-dec">
-                    <app-icons [icon]="'link'"></app-icons>
+                <a href="#" (click)="acceptInvite($event)" class="no-dec">
+                    <app-icons [icon]="'accept'"></app-icons>
                     Accept invite
                 </a>
 
-                <a class="no-dec">
-                    <app-icons [icon]="'link'"></app-icons>
+                <a href="#" (click)="rejectInvite($event)" class="no-dec margin-top">
+                    <app-icons [icon]="'reject'"></app-icons>
                     Reject invite
                 </a>
             </div>

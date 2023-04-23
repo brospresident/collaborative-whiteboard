@@ -15,6 +15,7 @@ import { DrawerComponent } from './components/drawer/drawer.component';
 import { ProjectComponent } from './components/project/project.component';
 import { IconsComponent } from './components/icons/icons.component';
 import { InvitationModalComponent } from './components/invitation-modal/invitation-modal.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { InvitationModalComponent } from './components/invitation-modal/invitati
     DrawerComponent,
     ProjectComponent,
     IconsComponent,
-    InvitationModalComponent
+    InvitationModalComponent,
+    NotFoundComponent
   ],
   imports: [
     BrowserModule,

@@ -43,7 +43,7 @@
         <div *ngIf="userInvitations.length">
             <hr>
             <div *ngFor="let invitation of userInvitations">
-                <app-project [type]="projectType" [project]="invitation"></app-project>
+                <app-project [project]="invitation"></app-project>
             </div>
         </div>
         <div *ngIf="!userInvitations.length">

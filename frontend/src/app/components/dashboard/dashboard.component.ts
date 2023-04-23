@@ -7,6 +7,7 @@ import { UserService } from 'src/app/services/user.service';
 import { ModalDismissReasons, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 import { PROJECT_TYPES } from 'src/app/constants';
+import { EmiterService } from 'src/app/services/emiter.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,12 +23,25 @@ export class DashboardComponent implements OnInit, OnChanges {
   projectType!: PROJECT_TYPES;
   userInvitations: any[] = [];
 
+  reload_dashboard_destroyer: any;
+
   constructor(private userService: UserService,
               private tokenService: TokenService,
               private rpcService: RpcService,
               public stateManager: StateManagerService,
               private modalService: NgbModal,
-              private router: Router) {}
+              private router: Router,
+              private emiterService: EmiterService
+  ) {
+    let that = this;
+    this.reload_dashboard_destroyer = this.emiterService.on('reload_dashboard', () => {
+      that.ngOnInit();
+    });
+  }
+
+  ngOnDestroy() {
+    this.reload_dashboard_destroyer();
+  }
 
   ngOnInit(): void {
     let that = this;
@@ -36,7 +50,7 @@ export class DashboardComponent implements OnInit, OnChanges {
         console.log('eroare la get projects', error);
         return;
       }
-
+      console.log('a luat proiecte')
       let projectIds = result.result;
 
       console.log('projectIds', projectIds);
@@ -44,10 +58,10 @@ export class DashboardComponent implements OnInit, OnChanges {
       that.rpcService.ask('projects.get_projects_data', {projectIds: projectIds}, (err: any, res: any) => {
         if (res.error) {
           console.log(res.error);
-          return
         }
+        console.log('a luat date proiecte')
 
-        that.userProjects = res.result;
+        that.userProjects = res && res.result || [];
         console.log(that.userProjects);
 
         that.rpcService.ask('users.getUserInvitations', {username: that.userService.getUser()}, (error: any, result: any) => {
@@ -55,8 +69,9 @@ export class DashboardComponent implements OnInit, OnChanges {
             console.log('eroare la get invitations', error);
             return;
           }
-
-          let invitationsIds = result.result;
+          console.log('a luat  invitatii')
+          console.log(result.result)
+          let invitationsIds = result.result.map((item: any) => item.item);
           console.log('invids', invitationsIds);
   
           that.rpcService.ask('projects.get_projects_data', {projectIds: invitationsIds}, (err: any, res: any) => {
@@ -64,7 +79,9 @@ export class DashboardComponent implements OnInit, OnChanges {
               console.log(res.error);
               // return
             } 
-    
+            
+            console.log('a luat date  invitatii')
+
             if (res.result) {
               that.userInvitations = res.result;
             } else {

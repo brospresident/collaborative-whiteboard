@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PROJECT_TYPES } from 'src/app/constants';
+import { EmiterService } from 'src/app/services/emiter.service';
 import { ModalServiceService } from 'src/app/services/modal-service.service';
 import { RpcService } from 'src/app/services/rpc.service';
 import { UserService } from 'src/app/services/user.service';
@@ -21,7 +22,8 @@ export class ProjectComponent implements OnInit {
 
   constructor(private userService: UserService,
               private rpcService: RpcService,
-              private ngModalService: NgbModal) {
+              private ngModalService: NgbModal,
+              private emiterService: EmiterService) {
   }
 
   ngOnInit() {
@@ -60,5 +62,33 @@ export class ProjectComponent implements OnInit {
     this.rpcService.ask('users.send_invitation', params, (error: any, response: any) => {
       this.ngModalService.dismissAll();
     });
+  }
+
+  acceptInvite(event: any) {
+    let that = this;
+    if (event) {
+      event.preventDefault();
+    }
+
+    let params = {
+      username: this.user,
+      projectId: this.project.projectId
+    }
+
+    this.rpcService.ask('users.accept_invite', params, (error: any, response: any) => {
+      if (error || response.error) {
+        console.log(error || response.error);
+        return;
+      }
+
+      this.emiterService.broadcast('reload_dashboard', null);
+    });
+  }
+
+  rejectInvite(event: any) {
+    if (event) {
+      event.preventDefault();
+    }
+
   }
 }

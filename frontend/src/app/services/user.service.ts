@@ -20,4 +20,8 @@ export class UserService {
     window.localStorage.setItem('cw_user', username);
     return true;
   }
+
+  public getUserToken() {
+    return window.localStorage.getItem('cw_token');
+  }
 }
