@@ -30,7 +30,8 @@ export class DrawerComponent implements OnInit, OnDestroy {
               private socketService: SocketService,
               private userService: UserService
     ) {
-    this.socketService.connect();
+    this.projectId = this.route.snapshot.queryParamMap.get('project_id');
+    this.socketService.connect(this.projectId);
     let that = this;
     this.socketService.on('client:draw', (data) => {
       data = data as any;
@@ -64,7 +65,6 @@ export class DrawerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.projectId = this.route.snapshot.queryParamMap.get('project_id');
   }
 
   redrawLayer() {
@@ -94,7 +94,7 @@ export class DrawerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.socketService.disconnect();
+    this.socketService.disconnect(this.projectId);
   }
 
   public emitEvent(): void {

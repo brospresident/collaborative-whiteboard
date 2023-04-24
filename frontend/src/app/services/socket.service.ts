@@ -9,8 +9,10 @@ export class SocketService {
 
   constructor() { }
 
-  public connect(): void {
+  public connect(id: any): void {
     this.socket = io('http://localhost:3000', {transports: ['polling']}); 
+    console.log(id);
+    this.emit('joinedOnDrawer', JSON.stringify({id}));
   }
 
   public emit(eventName: string, data: any): void {
@@ -21,7 +23,8 @@ export class SocketService {
     this.socket.on(eventName, callback);
   }
 
-  public disconnect(): void {
+  public disconnect(id: any): void {
     this.socket.disconnect();
+    this.emit('leftDrawer', JSON.stringify({id}));
   }
 }

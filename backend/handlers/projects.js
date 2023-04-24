@@ -5,14 +5,23 @@ const logger = require('nlogger').logger(module);
 const usersQuery = require('../mongo/users/users_query');
 const async = require('async');
 
+
 function generateProjectId() {
     return crypto.randomBytes(10).toString('hex');
 }
 
-/**
- * Save ID in User
- * Save full project in Projects document from mongo
- */
+let activeProjects = {};
+function activeProjectsSignal(projectId, signal) {
+    if (activeProjects[projectId]) {
+        if (signal == 'increase') {
+            activeProjects[projectId]++;
+        } if (signal == 'decrease') {
+            activeProjects[projectId]--;
+        }
+    } else {
+        activeProjects[projectId] = 1;
+    }
+}
 
 const projects = {
     add_project: function(req, res, next) {
@@ -70,6 +79,22 @@ const projects = {
                 return;
             }
         });
+    },
+
+    add_active_user_on_project: function(req, res, next) {
+        let id = req.body.params.id;
+        
+        activeProjectsSignal(id, 'increment');
+
+        res.json({id: 1, error: null, result: 'ok'});
+    },
+
+    delete_active_user_on_project: function(req, res, next) {
+        let id = req.body.params.id;
+
+        activeProjectsSignal(id, 'decrement');
+
+        res.json({id: 1, error: null, result: 'ok'});
     }
 }
 

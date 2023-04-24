@@ -3,9 +3,16 @@ const axios = require('axios');
 const _API_ADDR = `http://localhost:${process.env.PORT || 3000}/api`;
 
 module.exports = {
-    call_backend: function(body, callback) {
-        if (!body) {
-            callback('No JSON-RPC', null);
+    call_backend: function(endpoint, params, callback) {
+        let body = {
+            endpoint: endpoint,
+            id: 1,
+            jsonrpc: "2.0",
+            params: params
+        };
+
+        if (!params) {
+            callback('Not JSON-RPC', null);
             return;
         }
 

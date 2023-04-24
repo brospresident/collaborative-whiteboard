@@ -29,14 +29,14 @@
             </div>
 
             <div *ngIf="project.createdBy != user" class="row">
-                <a class="margin-top" (click)="leaveProject(project.projectId)">
+                <a href="#" class="margin-top" (click)="leaveProject(project.projectId, $event)">
                     <app-icons [icon]="'leave'"></app-icons>
                     Leave project
                 </a>
             </div>
 
             <div *ngIf="project.createdBy == user" class="row">
-                <a class="margin-top" (click)="open(content)">
+                <a href="#" class="margin-top" (click)="open(content, $event)">
                     <app-icons [icon]="'invite'"></app-icons>
                     Invite new member
                 </a>

@@ -1,4 +1,5 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PROJECT_TYPES } from 'src/app/constants';
 import { EmiterService } from 'src/app/services/emiter.service';
@@ -23,7 +24,7 @@ export class ProjectComponent implements OnInit {
   constructor(private userService: UserService,
               private rpcService: RpcService,
               private ngModalService: NgbModal,
-              private emiterService: EmiterService) {
+              private router: Router) {
   }
 
   ngOnInit() {
@@ -31,11 +32,31 @@ export class ProjectComponent implements OnInit {
     console.log(this.user);
   }
 
-  leaveProject(id: any) {
-    // TODO
+  leaveProject(id: any, event: any) {
+    if (event) {
+      event.preventDefault();
+    }
+
+    let params = {
+      project_id: this.project.projectId,
+      username: this.user
+    };
+
+    this.rpcService.ask('users.leave_project', params, (error: any, result: any) => {
+      if (error || result.error) {
+        console.log(error || result.error);
+        return;
+      }
+
+      window.location.reload();
+    });
   }
 
-  open(content: any) {
+  open(content: any, event: any) {
+    if (event) {
+      event.preventDefault();
+    }
+
     this.ngModalService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.then(
 			(result) => {
 			},
@@ -49,7 +70,6 @@ export class ProjectComponent implements OnInit {
   }
 
   sendInvitation() {
-
     let params = {
       invited_by: this.user,
       invited_username: this.invited_username,
@@ -57,7 +77,6 @@ export class ProjectComponent implements OnInit {
     };
 
     console.log(params);
-
 
     this.rpcService.ask('users.send_invitation', params, (error: any, response: any) => {
       this.ngModalService.dismissAll();
@@ -80,8 +99,8 @@ export class ProjectComponent implements OnInit {
         console.log(error || response.error);
         return;
       }
-
-      this.emiterService.broadcast('reload_dashboard', null);
+      console.log('trece de if')
+      this.router.navigateByUrl('/dashboard');
     });
   }
 
@@ -90,5 +109,22 @@ export class ProjectComponent implements OnInit {
       event.preventDefault();
     }
 
+    let params = {
+      username: this.user,
+      projectId: this.project.projectId
+    }
+
+    this.rpcService.ask('users.reject_invite', params, (error: any, response: any) => {
+      if (error || response.error) {
+        console.log(error || response.error);
+        return;
+      }
+
+      console.log('trece de if');
+
+      this.router.navigateByUrl('/dashboard');
+
+      window.location.reload();
+    });
   }
 }

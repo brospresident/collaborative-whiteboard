@@ -23,7 +23,6 @@ export class DashboardComponent implements OnInit, OnChanges {
   projectType!: PROJECT_TYPES;
   userInvitations: any[] = [];
 
-  reload_dashboard_destroyer: any;
 
   constructor(private userService: UserService,
               private tokenService: TokenService,
@@ -34,13 +33,10 @@ export class DashboardComponent implements OnInit, OnChanges {
               private emiterService: EmiterService
   ) {
     let that = this;
-    this.reload_dashboard_destroyer = this.emiterService.on('reload_dashboard', () => {
-      that.ngOnInit();
-    });
+    
   }
 
   ngOnDestroy() {
-    this.reload_dashboard_destroyer();
   }
 
   ngOnInit(): void {

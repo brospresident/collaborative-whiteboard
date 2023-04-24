@@ -51,16 +51,48 @@ function addProjectToUser(username, project_id, roles, callback) {
 }
 
 function deleteProjectInvitation(username, project_id, callback) {
-    userModel.findOneAndUpdate({username: username}, {
-        $pull: {
-            invitations: {
-                item: project_id 
-            }
+    getUser(username, (error, result) => {
+        if (error) {
+            logger.info(error);
+            return;
         }
-    }).then(deleted => {
-        callback(null, deleted);
-    }).catch(rejected => {
-        callback(rejected, null);
+
+        result.invitations = result.invitations.filter((item) => {
+            return item.item.project_id != project_id;
+        });
+
+        logger.info(result);
+
+        result.save().then(saved => {
+            logger.info('ok');
+            callback(null, 'ok');
+        }).catch(rejected => {
+            logger.info('not ok');
+            callback('not ok', null);
+        });
+    })
+}
+
+function deleteProjectFromUser(username, project_id, callback) {
+    getUser(username, (error, result) => {
+        if (error) {
+            logger.info(error);
+            return;
+        }
+
+        result.projects = result.projects.filter((item) => {
+            return item.project_id != project_id;
+        });
+
+        logger.info(result);
+
+        result.save().then(saved => {
+            logger.info('ok');
+            callback(null, 'ok');
+        }).catch(rejected => {
+            logger.info('not ok');
+            callback('not ok', null);
+        });
     });
 }
 
@@ -87,5 +119,6 @@ module.exports = {
     getUser,
     addProjectToUser,
     deleteProjectInvitation,
-    insertProjectInvitation
+    insertProjectInvitation,
+    deleteProjectFromUser
 }

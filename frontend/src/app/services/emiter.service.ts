@@ -4,19 +4,19 @@ import { EventEmitter, Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class EmiterService {
-  private emiter: any;
+  private emiter!: EventEmitter<any>;
   constructor() { 
     this.emiter = new EventEmitter();
   }
 
   public broadcast(eventName: string, params: any) {
-    this.emiter.emit(eventName, params);
+    // this.emiter.emit(eventName, params);
   }
 
   public on(eventName: string, callback: any) {
-    this.emiter.addListener(eventName, callback);
-    return () => {
-      this.emiter.removeListener(eventName, callback);
-    }
+    // this.emiter.addListener(eventName, callback);
+    // return () => {
+    //   this.emiter.removeListener(eventName, callback);
+    // }
   }
 }
