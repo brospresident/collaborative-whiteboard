@@ -49,6 +49,27 @@ module.exports = {
         }).catch(reject => {
             callback(reject, null);
         });
+    },
+
+    save_project_data: function(projectId, shapes, callback) {
+        this.get_project_data(projectId, (error, result) => {
+            if (error) {
+                logger.info(error);
+                callback(error, null);
+            } else {
+                result.shapes = shapes;
+
+                result.save().then(saved => {
+                    if (saved) {
+                        callback(null, saved);
+                    }
+                }).catch(rejected => {
+                    if (rejected) {
+                        callback(rejected, null);
+                    }
+                });
+            }
+        });
     }
 }
 

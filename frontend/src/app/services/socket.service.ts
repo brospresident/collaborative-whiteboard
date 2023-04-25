@@ -11,7 +11,6 @@ export class SocketService {
 
   public connect(id: any): void {
     this.socket = io('http://localhost:3000', {transports: ['polling']}); 
-    console.log(id);
     this.emit('joinedOnDrawer', JSON.stringify({id}));
   }
 
@@ -24,7 +23,7 @@ export class SocketService {
   }
 
   public disconnect(id: any): void {
-    this.socket.disconnect();
     this.emit('leftDrawer', JSON.stringify({id}));
+    this.socket.disconnect();
   }
 }

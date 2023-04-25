@@ -30,7 +30,7 @@ io.on('connection', (socket) => {
             if (error) {
                 throw error;
             } else {
-                logger.info('user count incremented');
+                // logger.info('user count incremented');
             }
         })
     });
@@ -38,16 +38,28 @@ io.on('connection', (socket) => {
     socket.on('leftDrawer', (data) => {
         data = JSON.parse(data);
         let id = data.id;
-    })
+
+        utils.call_backend('projects.remove_active_user_on_project', {id}, (error, result) => {
+            if (error) {
+                throw error;
+            }
+        });
+    });
 
     socket.on('server:draw', (data) => {
         logger.info(data);
         socket.broadcast.emit('client:draw', data);
+
+        utils.call_backend('projects.update_project_data', {data}, (error, result) => {
+            if (error) {
+                logger.info(error);
+            } else {
+                logger.info(result.result);
+            }
+        });
     });
 
     socket.on('disconnect', () => {
-        data = JSON.parse(data);
-
         logger.info('a user disconnected');
     });
 });

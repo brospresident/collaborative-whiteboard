@@ -5,6 +5,7 @@ import Konva from 'konva';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SocketService } from 'src/app/services/socket.service';
 import { UserService } from 'src/app/services/user.service';
+import { RpcService } from 'src/app/services/rpc.service';
 
 @Component({
   selector: 'app-drawer',
@@ -28,7 +29,8 @@ export class DrawerComponent implements OnInit, OnDestroy {
   constructor(private router: Router, 
               private route: ActivatedRoute, 
               private socketService: SocketService,
-              private userService: UserService
+              private userService: UserService,
+              private rpcService: RpcService
     ) {
     this.projectId = this.route.snapshot.queryParamMap.get('project_id');
     this.socketService.connect(this.projectId);
@@ -65,6 +67,19 @@ export class DrawerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    console.log('init boy')
+    let that = this;
+    this.rpcService.ask('projects.get_shapes', {projectId: this.projectId}, (error: any, result: any) => {
+      if (error) {
+        console.log(error);
+        return;
+      } else {
+        console.log(result);
+        let shapes = result.result.shapes.map((shape: any) => JSON.parse(shape));
+        that.socketShapes = shapes;
+        that.redrawLayer();
+      }
+    });
   }
 
   redrawLayer() {
@@ -337,6 +352,9 @@ export class DrawerComponent implements OnInit, OnDestroy {
   }
 
   goToDashboard() {
+    let obj = JSON.stringify({id: this.projectId});
+    console.log(obj);
+    this.socketService.emit('leftDrawer', obj);
     this.router.navigate(['/dashboard']);
   }
 }
