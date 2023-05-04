@@ -96,10 +96,53 @@ export class DrawerComponent implements OnInit, OnDestroy {
     let attrs = obj.attrs;
     switch(obj.className) {
       case "Rect": {
-        return new Konva.Rect(attrs);
+        let rect = new Konva.Rect(attrs);
+        rect.on('dragend', (event) => {
+          this.sendData();
+        });
+
+        rect.on('transform', (event) => {
+          this.sendData();
+        });
+      
+        rect.on('click', (event) => {
+          console.log('intra pe click');
+
+          const tr = new Konva.Transformer({
+            enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+          });
+        
+          // Add the transformer to the layer
+          this.layer.add(tr);
+          tr.nodes([rect]);
+          this.layer.batchDraw()
+        });
+        return rect;
       }
       case "Circle": {
-        return new Konva.Circle(attrs);
+        let circle = new Konva.Circle(attrs);
+        circle.on('dragend', (event) => {
+          this.sendData();
+        });
+
+        circle.on('transform', (event) => {
+          this.sendData();
+        });
+
+        circle.on('click', (event) => {
+          console.log('intra pe click');
+
+          const tr = new Konva.Transformer({
+            enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+          });
+        
+          // Add the transformer to the layer
+          this.layer.add(tr);
+          tr.nodes([circle]);
+          this.layer.batchDraw();
+        });
+      
+        return circle;
       }
       case "Line": {
         return new Konva.Line(attrs);
@@ -166,6 +209,9 @@ export class DrawerComponent implements OnInit, OnDestroy {
   }
 
   startDrawing() {
+    if (this.isErasing) {
+      this.isErasing = false;
+    }
     this.isDrawing = true;
   }
 
@@ -234,8 +280,23 @@ export class DrawerComponent implements OnInit, OnDestroy {
     });
 
     circle.on('dragend', (event) => {
-      // TOOD: call socket
       this.sendData();
+    });
+
+    circle.on('transform', (event) => {
+      this.sendData();
+    });
+
+    circle.on('click', (event) => {
+      console.log('intra pe click');
+      const tr = new Konva.Transformer({
+        enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+      });
+    
+      // Add the transformer to the layer
+      this.layer.add(tr);
+      tr.nodes([circle]);
+      this.layer.batchDraw()
     });
   
     // Create a transformer for the circle
@@ -282,6 +343,26 @@ export class DrawerComponent implements OnInit, OnDestroy {
       draggable: true,
       width: 100,
       height: 50
+    });
+
+    rect.on('dragend', (event) => {
+      this.sendData();
+    });
+
+    rect.on('transform', (event) => {
+      this.sendData();
+    });
+
+    rect.on('click', (event) => {
+      console.log('intra pe click');
+      const tr = new Konva.Transformer({
+        enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+      });
+    
+      // Add the transformer to the layer
+      this.layer.add(tr);
+      tr.nodes([rect]);
+      this.layer.batchDraw()
     });
   
     // Create a transformer for the circle
